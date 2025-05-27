@@ -28,16 +28,20 @@ if uploaded_file and openai_api_key:
         else:
             prompt = f"""You are a data analyst. Here is the data:\n{df.to_csv(index=False)}\n\nAnswer the following question based on this data:\n\n{question}"""
             try:
-                openai.api_key = openai_api_key
-                response = openai.ChatCompletion.create(
+                from openai import OpenAI
+                client = OpenAI(api_key=openai_api_key)
+
+                response = client.chat.completions.create(
                     model="gpt-3.5-turbo",
                     messages=[{"role": "user", "content": prompt}],
                     temperature=0.3,
                 )
-                answer = response.choices[0].message["content"]
+
+                answer = response.choices[0].message.content
                 st.success("🧠 AI Answer:")
                 st.write(answer)
             except Exception as e:
                 st.error(f"❌ Error from OpenAI: {e}")
 else:
     st.info("📥 Please upload a file and enter your OpenAI API key to continue.")
+
